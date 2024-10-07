@@ -48,7 +48,7 @@ func Serve() {
 	}
 	retryWorkerContext, retryWorkerContextCancel := context.WithCancel(context.TODO())
 	app.Wg.Add(1)
-	logger.Info("starting discount aggregator server on %s (version: %s)",
+	logger.Info("starting api server on %s (version: %s)",
 		cfg.GetServerAddress(), version.GetVersion())
 	err = server.Run(cfg.GetServerAddress(), app.routes())
 	if err != nil {
