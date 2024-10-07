@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  db:
+    container_name: discount_aggregators_db
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_USER=${MASTER_DB_USER}
+      - POSTGRES_PASSWORD=${MASTER_DB_PASSWORD}
+      - POSTGRES_DB=${MASTER_DB_NAME}
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+
+  web:
+    container_name: discount_aggregators_web
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+      - "4000:4000"
+    volumes:
+      - .:/usr/src/app
+    links:
+      - db:db
+    command: [ "air", "./service/main.go" ]
