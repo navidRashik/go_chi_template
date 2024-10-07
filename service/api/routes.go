@@ -29,10 +29,9 @@ func (app *CoreAppStruct) routes() http.Handler {
 
 	mainRouter.Use(app.RecoverPanic)
 	mainRouter.Use(app.Cors)
-
-	healthRoute := health.Routes(&health.HealthAppStruct{Application: app.Application})
-
-	mainRouter.Mount("/api", healthRoute)
+	mainRouter.Route("/api", func(r chi.Router) {
+		r.Mount("/health", health.Routes(&health.HealthAppStruct{Application: app.Application}))
+	})
 
 	return mainRouter
 }

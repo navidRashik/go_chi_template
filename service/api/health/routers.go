@@ -7,8 +7,11 @@ import (
 )
 
 func Routes(app *HealthAppStruct) http.Handler {
-	mux := chi.NewMux()
-	// healthApp := healthStruct{app}
-	mux.Get("/health", app.status)
-	return mux
+	router := chi.NewRouter()
+
+	router.Get("/", app.status)
+	router.Get("/ready", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+	return router
 }
