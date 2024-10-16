@@ -14,4 +14,4 @@ COPY . .
 
 RUN go mod tidy
 
-ENTRYPOINT [ "air", "./cmd/main.go" ]
+ENTRYPOINT [ "air", "./service/main.go" ]

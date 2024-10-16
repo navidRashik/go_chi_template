@@ -5,7 +5,6 @@ go 1.23.1
 require (
 	github.com/confluentinc/confluent-kafka-go v1.9.2
 	github.com/fatih/color v1.17.0
-	github.com/go-chi/chi v1.5.1
 	github.com/go-playground/validator/v10 v10.22.1
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-migrate/migrate/v4 v4.18.1
