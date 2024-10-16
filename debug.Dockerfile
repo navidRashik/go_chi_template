@@ -16,7 +16,7 @@ RUN go install github.com/go-delve/delve/cmd/dlv
 COPY . .
 
 # Build the Go application
-RUN GOPRIVATE=gitlab.upay.dev/golang CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build  -v -o main cmd/main.go
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build  -v -o main service/main.go
 
 # Set the debug port for Delve
 EXPOSE 40000

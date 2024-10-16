@@ -16,7 +16,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go app
-RUN GOPRIVATE=gitlab.upay.dev/golang CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build  -v -o main cmd/main.go
+RUN CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build  -v -o main cmd/main.go
 
 
 # Start a new stage from scratch

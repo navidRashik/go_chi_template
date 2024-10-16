@@ -8,7 +8,6 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 
 	"example_project/internal/database"
-	discountaggregator "example_project/internal/discount_aggregator"
 	"example_project/internal/leveledlog"
 	"example_project/internal/structs"
 )
@@ -74,13 +73,14 @@ func (k *Kafka) handleConsumerEvent(e kafka.Event) {
 			discountLogTable := database.DiscountLogTable(*k.Db)
 			unprocessedTransactionLogTable := database.UnprocessedTransactionLogTable(*k.Db)
 			merchantMapTable := database.MerchantMapTable(*k.Db)
-
-			trxEventDb := discountaggregator.DbRepo{
-				DiscountLog:               &discountLogTable,
-				UnprocessedTransactionLog: &unprocessedTransactionLogTable,
-				MerchantMap:               &merchantMapTable,
-			}
-			discountaggregator.HandleDiscountEvent(k.Wg, nil, 0, trxEventDb, &payload)
+			fmt.Println(discountLogTable, unprocessedTransactionLogTable, merchantMapTable)
+			// todo: need to fix this part.
+			// trxEventDb := discountaggregator.DbRepo{
+			// 	DiscountLog:               &discountLogTable,
+			// 	UnprocessedTransactionLog: &unprocessedTransactionLogTable,
+			// 	MerchantMap:               &merchantMapTable,
+			// }
+			// discountaggregator.HandleDiscountEvent(k.Wg, nil, 0, trxEventDb, &payload)
 		}
 	default:
 		fmt.Printf("Ignored event: %s\n", ev)
