@@ -50,7 +50,7 @@ func Serve() {
 	consumerDone := make(chan bool)
 	consumer := redisclient.Redis{Config: *cfg, Db: db, Logger: logger, Wg: app.Wg, DistributedRedisClient: nil}
 	go consumer.ConsumerEvent(consumerDone, quit)
-	app.Wg.Add(1)
+	// app.Wg.Add(1)
 	logger.Info("starting api server on %s (version: %s)",
 		cfg.GetServerAddress(), version.GetVersion())
 	err = server.Run(cfg.GetServerAddress(), app.routes(), quit)
