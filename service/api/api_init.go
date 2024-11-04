@@ -1,16 +1,15 @@
 package api
 
 import (
-	"context"
 	"example_project/internal/config"
 	"example_project/internal/database"
 	"example_project/internal/leveledlog"
+	"example_project/internal/redisclient"
 	"example_project/internal/server"
 	"example_project/internal/version"
 	"example_project/service/api/utils"
 	"os"
 	"sync"
-	"time"
 
 	jwtauth "github.com/go-chi/jwtauth/v5"
 	"github.com/go-playground/validator"
@@ -21,6 +20,7 @@ type CoreAppStruct struct {
 }
 
 func Serve() {
+	quit := make(chan os.Signal, 1)
 	cfg, err := config.SetupConfig()
 	if err != nil {
 		panic(err)
@@ -46,22 +46,26 @@ func Serve() {
 			TokenManager: jwtauth.New("HS256", []byte(cfg.SecretKey), nil),
 		},
 	}
-	retryWorkerContext, retryWorkerContextCancel := context.WithCancel(context.TODO())
+	// retryWorkerContext, retryWorkerContextCancel := context.WithCancel(context.TODO())
+	consumerDone := make(chan bool)
+	consumer := redisclient.Redis{Config: *cfg, Db: db, Logger: logger, Wg: app.Wg, DistributedRedisClient: nil}
+	go consumer.ConsumerEvent(consumerDone, quit)
 	app.Wg.Add(1)
 	logger.Info("starting api server on %s (version: %s)",
 		cfg.GetServerAddress(), version.GetVersion())
-	err = server.Run(cfg.GetServerAddress(), app.routes())
+	err = server.Run(cfg.GetServerAddress(), app.routes(), quit)
 	if err != nil {
+		logger.Error("error form the server--------->")
 		logger.Fatal(err.Error())
 	}
 	logger.Info("server stopped")
-	go utils.HandleUnprocessedEvent(retryWorkerContext, app.Wg, time.Duration(app.Config.RetryCount))
+	// go utils.HandleUnprocessedEvent(retryWorkerContext, app.Wg, time.Duration(app.Config.RetryCount))
 
-	retryWorkerContextCancel() // cancel retry worker context
+	// retryWorkerContextCancel() // cancel retry worker context
 	logger.Info("closed consumer routine, waiting on application waitgroup")
 	app.Wg.Wait() // wait for retry worker to close
 	logger.Info("exiting application, graceful shutdown completed")
-
+	<-consumerDone
 	// producer.Close()           // close producer
 	// <-producerDone             // wait for producer to close
 	// logger.Info("closed producer routine, waiting on consumer routine")

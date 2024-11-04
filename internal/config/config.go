@@ -37,6 +37,7 @@ type Config struct {
 	NotificationBaseUrl string `mapstructure:"NOTIFICATION_BASE_URL"`
 	RetryPeriod         int    `mapstructure:"RETRY_PERIOD"`
 	RetryCount          int    `mapstructure:"RETRY_COUNT"`
+	DistributedRedisUrl string `mapstructure:"DISTRIBUTED_REDIS_URL"`
 }
 
 var ConfigStruct Config
