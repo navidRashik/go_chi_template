@@ -13,7 +13,6 @@ type RedisData struct {
 	consumerGroupName string
 	consumerName      string
 	redisClient       *redis.Client
-	operationStrategy RedisStreamOperationRepo
 }
 
 func (r *RedisData) GetStreamName() string {

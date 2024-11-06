@@ -3,7 +3,6 @@ package redisclient
 import (
 	"context"
 
-	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 )
 
@@ -11,7 +10,6 @@ type RedisStreamOperationRepo interface {
 	preRunOperation(ctx context.Context) error
 	postRunOperation(ctx context.Context) error
 	RunOperation(ctx context.Context) error
-	Write(ctx context.Context, messageData map[string]interface{}) error
 	RedisDataRepo
 }
 
@@ -37,21 +35,4 @@ func (r *RedisStreamRunnerBaseOperationImpl) postRunOperation(ctx context.Contex
 		r.GetRedisData().messageID, r.GetRedisData().messageData)
 
 	return r.GetRedisData().redisClient.XAck(ctx, r.GetRedisData().streamName, r.GetRedisData().consumerGroupName, r.GetRedisData().messageID).Err()
-}
-func (r *RedisStreamRunnerBaseOperationImpl) Write(ctx context.Context, messageData map[string]interface{}) error {
-	// Implement the logic to write the message to Redis
-	// using the Redis client
-
-	// Example code:
-	logrus.Info("Writing message to Redis------------------->")
-	streamName := r.GetStreamName()
-	err := r.GetRedisData().redisClient.XAdd(ctx, &redis.XAddArgs{
-		Stream: streamName,
-		Values: messageData,
-	}).Err()
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

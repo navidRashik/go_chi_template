@@ -61,7 +61,6 @@ func Serve() {
 		logger.Fatal(err.Error())
 	}
 	logger.Info("server stopped")
-	// go utils.HandleUnprocessedEvent(retryWorkerContext, app.Wg, time.Duration(app.Config.RetryCount))
 
 	// retryWorkerContextCancel() // cancel retry worker context
 	logger.Info("closed consumer routine, waiting on application waitgroup")

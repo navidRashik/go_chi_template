@@ -170,62 +170,26 @@ func (r *RedisStreamRunnerOperationExample) RunOperation(ctx context.Context) er
 	logrus.Info("Your New implementation here for the operations--------->")
 
 	// TODO: Testing write opearation so comment the following code of r.Write
-	r.Write(ctx, r.GetRedisData().messageData)
+	// r.Write(ctx, r.GetRedisData().messageData)
 	return r.RedisStreamOperationRepo.RunOperation(ctx)
 }
 
-func (r *RedisStreamRunnerOperationExample) Write(ctx context.Context, messageData map[string]interface{}) error {
-	// Implement the logic to write the message to Redis
-	// using the Redis client
+// func (r *RedisStreamRunnerOperationExample) Write(ctx context.Context, messageData map[string]interface{}) error {
+// 	// Implement the logic to write the message to Redis
+// 	// using the Redis client
 
-	// Example code:
-	logrus.Info("Writing message to Redis------------------->")
-	err := r.GetRedisData().redisClient.XAdd(ctx, &redis.XAddArgs{
-		Stream: r.GetStreamName(),
-		Values: messageData,
-	}).Err()
-	if err != nil {
-		logrus.Errorf("Error writing message to Redis: %v", err)
-		return err
-	}
-
-	return nil
-}
-
-// func main() {
-// 	// Create Redis client
-// 	// initialize initiator
-// 	//create data
-// 	// operationStrategy := &RedisStreamRunnerOperationExample{
-// 	// 	RedisStreamRunnerBaseOperationImpl{
-// 	// 		RedisData: redisData,
-// 	// 	},
-// 	// }
-// 	// Generate a unique consumer name
-// 	// Create a context that can be cancelled
-// 	ctx, redisClient, consumerGroupName, redisStreamInitiator, runners, consumerName, cancel := PrepareRedis()
-// 	go func() {
-// 		if err := redisStreamInitiator.ReadStream(ctx, runners, consumerName, consumerGroupName, redisClient); err != nil {
-// 			logrus.Fatalf("Error reading stream: %v", err)
-// 		}
-// 	}()
-
-// 	// Catch SIGINT and SIGTERM signals
-// 	sigChan := make(chan os.Signal, 1)
-// 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGQUIT)
-
-// 	// Wait for a signal
-// 	<-sigChan
-
-// 	// Cancel the context to stop the ReadStream goroutine
-
-// 	// Perform a clean shutdown
-// 	if err := redisStreamInitiator.teardownStreamReader(ctx, consumerName, redisClient, consumerGroupName, redisStreamInitiator.GetStreamListenerMap()); err != nil {
-// 		logrus.Errorf("Error tearing down stream reader: %v", err)
+// 	// Example code:
+// 	logrus.Info("Writing message to Redis------------------->")
+// 	err := r.GetRedisData().redisClient.XAdd(ctx, &redis.XAddArgs{
+// 		Stream: r.GetStreamName(),
+// 		Values: messageData,
+// 	}).Err()
+// 	if err != nil {
+// 		logrus.Errorf("Error writing message to Redis: %v", err)
+// 		return err
 // 	}
-// 	cancel()
 
-// 	logrus.Info("Shutdown complete")
+// 	return nil
 // }
 
 func PrepareRedis(ctx context.Context, redisClient *redis.Client) (context.Context, *redis.Client, string, *RedisStreamInitiatorImpl, []RedisStreamBaseRunnerRepo, string, context.CancelFunc) {
@@ -238,14 +202,6 @@ func PrepareRedis(ctx context.Context, redisClient *redis.Client) (context.Conte
 		consumerGroupName: consumerGroupName,
 	}
 
-	operationStrategy := &RedisStreamRunnerOperationExample{
-		RedisStreamOperationRepo: &RedisStreamRunnerBaseOperationImpl{
-			RedisDataRepo: redisData,
-		},
-	}
-
-	redisData.operationStrategy = operationStrategy
-
 	redisStreamInitiator := &RedisStreamInitiatorImpl{
 		streamListenerMap: make(map[string]string),
 	}
@@ -253,6 +209,7 @@ func PrepareRedis(ctx context.Context, redisClient *redis.Client) (context.Conte
 	runners := []RedisStreamBaseRunnerRepo{
 		&RedisStreamBaseRunnerImpl{
 			RedisData: redisData,
+			op:        &RedisStreamRunnerOperationExample{&RedisStreamRunnerBaseOperationImpl{redisData}},
 		},
 	}
 
