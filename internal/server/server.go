@@ -10,7 +10,8 @@ import (
 	"time"
 )
 
-func Run(addr string, h http.Handler, quit chan os.Signal) error {
+func Run(addr string, h http.Handler) error {
+	quit := make(chan os.Signal, 1)
 	srv := &http.Server{
 		Addr:         addr,
 		Handler:      h,

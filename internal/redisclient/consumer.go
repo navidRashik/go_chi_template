@@ -4,17 +4,17 @@ import (
 	"context"
 	"example_project/internal/leveledlog"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 )
 
-func (r *Redis) ConsumerEvent(doneChan chan bool, quit chan os.Signal) {
+func (r *Redis) ConsumerEvent(doneChan chan bool, wg *sync.WaitGroup) {
+
 	logger := leveledlog.NewLogger(os.Stdout, leveledlog.LevelAll, true)
-	defer func() {
-		doneChan <- true
-	}()
+
 	opt, err := redis.ParseURL(r.Config.DistributedRedisUrl)
 	if err != nil {
 		r.Logger.Error("failed to parse redis url, details: %s", err.Error())
@@ -34,19 +34,19 @@ func (r *Redis) ConsumerEvent(doneChan chan bool, quit chan os.Signal) {
 		}
 	}()
 
-	// Catch SIGINT and SIGTERM signals
-	// Wait for a signal
-	<-quit
+	defer func() {
+		// Perform a clean shutdown
+		if err := redisStreamInitiator.teardownStreamReader(ctx, consumerName, redisClient, consumerGroupName, redisStreamInitiator.GetStreamListenerMap()); err != nil {
+			logrus.Errorf("Error tearing down stream reader: %v", err)
+		}
+		cancel()
 
-	// Cancel the context to stop the ReadStream goroutine
+		logrus.Info("Shutdown complete")
+		doneChan <- true
+	}()
 
-	// Perform a clean shutdown
-	if err := redisStreamInitiator.teardownStreamReader(ctx, consumerName, redisClient, consumerGroupName, redisStreamInitiator.GetStreamListenerMap()); err != nil {
-		logrus.Errorf("Error tearing down stream reader: %v", err)
-	}
-	cancel()
-
-	logrus.Info("Shutdown complete")
+	// until server closed this will wait
+	wg.Wait()
 
 }
 
