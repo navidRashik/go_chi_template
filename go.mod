@@ -1,6 +1,6 @@
 module example_project
 
-go 1.23.1
+go 1.24
 
 require (
 	github.com/confluentinc/confluent-kafka-go v1.9.2
@@ -56,7 +56,7 @@ require (
 )
 
 require (
-	github.com/go-chi/chi/v5 v5.1.0
+	github.com/go-chi/chi/v5 v5.4.0
 	github.com/go-chi/cors v1.2.1
 	github.com/go-chi/jwtauth/v5 v5.3.1
 	github.com/go-playground/validator v9.31.0+incompatible
